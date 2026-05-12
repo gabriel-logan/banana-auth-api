@@ -6,6 +6,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_DOMAINS=${ALLOWED_DOMAINS}
     depends_on:
       auth-db:
         condition: service_healthy

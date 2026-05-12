@@ -8,8 +8,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowedDomains = builder.Configuration["ALLOWED_DOMAINS"] ?? "";
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendCors", policy =>
+    {
+        var domains = allowedDomains
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (allowedDomains.Trim() == "*")
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            return;
+        }
+
+        if (domains.Length > 0)
+        {
+            policy
+                .WithOrigins(domains)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            return;
+        }
+
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var connectionString = builder.Configuration["DATABASE_URL"]
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
@@ -53,6 +85,7 @@ builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 var app = builder.Build();
 
+app.UseCors("FrontendCors");
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
