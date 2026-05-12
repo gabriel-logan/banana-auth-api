@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 #nullable disable
 
 namespace Banana.Auth.Api.Infrastructure.Database.Migrations;
 
+[DbContext(typeof(AuthDbContext))]
+[Migration("20260512000000_BaselineAuthSchema")]
 public partial class BaselineAuthSchema : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
