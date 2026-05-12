@@ -96,8 +96,7 @@ app.UseExceptionHandler(errorApp =>
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    dbContext.Database.EnsureCreated();
-    EnsureUsersSchema(dbContext);
+    dbContext.Database.Migrate();
 }
 
 app.MapControllers();
@@ -105,26 +104,3 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
-
-static void EnsureUsersSchema(AuthDbContext dbContext)
-{
-    dbContext.Database.ExecuteSqlRaw("""
-        ALTER TABLE "Users"
-        ADD COLUMN IF NOT EXISTS "RefreshTokenHash" text NULL;
-        """);
-
-    dbContext.Database.ExecuteSqlRaw("""
-        ALTER TABLE "Users"
-        ADD COLUMN IF NOT EXISTS "RefreshTokenExpiresAt" timestamp with time zone NULL;
-        """);
-
-    dbContext.Database.ExecuteSqlRaw("""
-        ALTER TABLE "Users"
-        ADD COLUMN IF NOT EXISTS "RefreshTokenCreatedAt" timestamp with time zone NULL;
-        """);
-
-    dbContext.Database.ExecuteSqlRaw("""
-        ALTER TABLE "Users"
-        ADD COLUMN IF NOT EXISTS "UpdatedAt" timestamp with time zone NOT NULL DEFAULT NOW();
-        """);
-}
