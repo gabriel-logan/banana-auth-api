@@ -1,0 +1,25 @@
+services:
+  auth-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: banana
+      POSTGRES_PASSWORD: banana
+      POSTGRES_DB: banana_auth
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U banana -d banana_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
