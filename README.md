@@ -13,6 +13,10 @@ Authentication microservice — ASP.NET Core Web API.
 
 ```bash
 docker compose up --build
+
+# or
+
+docker-compose up --build
 ```
 
 This starts:
