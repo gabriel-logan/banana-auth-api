@@ -2,6 +2,16 @@
 
 Authentication microservice — ASP.NET Core Web API.
 
+## Tech Choices
+
+- **ASP.NET Core Web API**: simple and explicit REST API structure
+- **Entity Framework Core**: relational persistence with migrations support
+- **PostgreSQL**: independent relational database for the auth service
+- **BCrypt**: password hashing with a well-known and battle-tested algorithm
+- **JWT**: stateless access token for integration with the reservations API
+
+The project keeps the architecture lightweight: controller, service, repository, DTOs and entity model, without adding unnecessary layers.
+
 ## Routes
 
 - **GET /health** — Health check
