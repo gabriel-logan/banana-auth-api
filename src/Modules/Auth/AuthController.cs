@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Banana.Auth.Api.Modules.Auth;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
