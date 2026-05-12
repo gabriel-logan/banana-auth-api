@@ -16,6 +16,12 @@ Authentication microservice — ASP.NET Core Web API.
 | `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Secret key for signing JWT tokens |
 
+## Database
+
+The service uses Entity Framework Core with PostgreSQL.
+
+Database migrations are applied automatically on startup.
+
 ## Recommended: Run with Docker
 
 ```bash
@@ -38,7 +44,6 @@ This starts:
 Requires:
 
 - PostgreSQL installed locally
-- Auth database created manually
 - Environment variables configured manually
 
 ```bash
