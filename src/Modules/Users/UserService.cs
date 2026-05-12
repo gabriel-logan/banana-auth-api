@@ -21,6 +21,6 @@ public class UserService : IUserService
             throw new AppException("User not found.", 404);
         }
 
-        return new UserResponse(user.Id, user.Email, user.CreatedAt);
+        return new UserResponse(user.Id, user.Email, user.CreatedAt, user.UpdatedAt);
     }
 }

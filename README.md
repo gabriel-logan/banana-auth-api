@@ -7,6 +7,7 @@ Authentication microservice — ASP.NET Core Web API.
 - **GET /health** — Health check
 - **POST /api/auth/register** — Register a new user. Body: `{ email, password }`
 - **POST /api/auth/login** — Authenticate and receive JWT. Body: `{ email, password }`
+- **POST /api/auth/refresh** — Receive a new JWT and a new refresh token. Body: `{ refreshToken }`
 
 ## Environment Variables
 

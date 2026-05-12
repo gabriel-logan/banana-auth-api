@@ -38,8 +38,7 @@ public class AuthService : IAuthService
         {
             Id = Guid.NewGuid(),
             Email = email,
-            PasswordHash = _passwordHasher.Hash(request.Password),
-            CreatedAt = DateTime.UtcNow
+            PasswordHash = _passwordHasher.Hash(request.Password)
         };
 
         var refreshToken = SetRefreshToken(user);
@@ -100,7 +99,7 @@ public class AuthService : IAuthService
         return new AuthResponse(
             _jwtService.GenerateAccessToken(user),
             refreshToken,
-            new UserResponse(user.Id, user.Email, user.CreatedAt)
+            new UserResponse(user.Id, user.Email, user.CreatedAt, user.UpdatedAt)
         );
     }
 
