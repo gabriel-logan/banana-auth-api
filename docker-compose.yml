@@ -4,9 +4,9 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - ALLOWED_DOMAINS=${ALLOWED_DOMAINS}
+      DATABASE_URL: ${DATABASE_URL:-Host=auth-db;Port=5432;Database=banana_auth;Username=banana;Password=banana}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_DOMAINS: ${ALLOWED_DOMAINS}
     depends_on:
       auth-db:
         condition: service_healthy
