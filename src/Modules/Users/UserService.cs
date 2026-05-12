@@ -1,11 +1,26 @@
+using Banana.Auth.Api.Common.Exceptions;
 using Banana.Auth.Api.Modules.Users.DTOs;
 
 namespace Banana.Auth.Api.Modules.Users;
 
 public class UserService : IUserService
 {
-    public Task<UserResponse> GetByIdAsync(Guid id)
+    private readonly IUserRepository _userRepository;
+
+    public UserService(IUserRepository userRepository)
     {
-        throw new NotImplementedException();
+        _userRepository = userRepository;
+    }
+
+    public async Task<UserResponse> GetByIdAsync(Guid id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+
+        if (user is null)
+        {
+            throw new AppException("User not found.", 404);
+        }
+
+        return new UserResponse(user.Id, user.Email, user.CreatedAt);
     }
 }

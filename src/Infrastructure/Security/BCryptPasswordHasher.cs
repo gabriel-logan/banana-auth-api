@@ -4,11 +4,11 @@ public class BCryptPasswordHasher : IPasswordHasher
 {
     public string Hash(string password)
     {
-        throw new NotImplementedException();
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
     public bool Verify(string password, string hash)
     {
-        throw new NotImplementedException();
+        return BCrypt.Net.BCrypt.Verify(password, hash);
     }
 }
