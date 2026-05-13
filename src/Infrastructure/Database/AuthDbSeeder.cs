@@ -34,13 +34,13 @@ public class AuthDbSeeder
         {
             new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 Email = "ana.silva@banana.local",
                 PasswordHash = _passwordHasher.Hash(defaultPassword)
             },
             new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Email = "bruno.costa@banana.local",
                 PasswordHash = _passwordHasher.Hash(defaultPassword)
             }
