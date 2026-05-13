@@ -9,15 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var allowedDomains = builder.Configuration["ALLOWED_DOMAINS"] ?? "";
+var normalizedAllowedDomains = ExpandAllowedDomains(allowedDomains);
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendCors", policy =>
     {
-        var domains = allowedDomains
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
         if (allowedDomains.Trim() == "*")
         {
             policy
@@ -27,10 +25,10 @@ builder.Services.AddCors(options =>
             return;
         }
 
-        if (domains.Length > 0)
+        if (normalizedAllowedDomains.Length > 0)
         {
             policy
-                .WithOrigins(domains)
+                .WithOrigins(normalizedAllowedDomains)
                 .AllowAnyHeader()
                 .AllowAnyMethod();
             return;
@@ -139,3 +137,33 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
+
+static string[] ExpandAllowedDomains(string allowedDomains)
+{
+    var origins = allowedDomains
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    var expandedOrigins = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var origin in origins)
+    {
+        expandedOrigins.Add(origin);
+
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+        {
+            continue;
+        }
+
+        if (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Equals("::1", StringComparison.OrdinalIgnoreCase))
+        {
+            var port = uri.IsDefaultPort ? string.Empty : $":{uri.Port}";
+            expandedOrigins.Add($"{uri.Scheme}://localhost{port}");
+            expandedOrigins.Add($"{uri.Scheme}://127.0.0.1{port}");
+            expandedOrigins.Add($"{uri.Scheme}://[::1]{port}");
+        }
+    }
+
+    return expandedOrigins.ToArray();
+}
