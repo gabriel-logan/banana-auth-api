@@ -15,7 +15,7 @@ This service does not call the reservations service directly. The frontend uses 
 
 - **ASP.NET Core Web API** because the challenge explicitly asks for a C# API and ASP.NET Core is the most standard and production-proven choice in this ecosystem. I chose it over building a more minimal custom host because it gives native routing, model validation, dependency injection and middleware with very little boilerplate, which keeps the auth service straightforward and maintainable.
 - **Entity Framework Core** because the project needs relational persistence with a mature ORM that integrates naturally with ASP.NET Core. I chose EF Core over writing raw SQL or using a micro-ORM like Dapper because this service is small, CRUD-oriented and benefits more from fast development, migrations and clear entity mapping than from lower-level query control.
-- **PostgreSQL** because it is a robust relational database, fits the challenge requirement well and works consistently across both microservices. I chose it over SQLite because the project models concurrent business data and relational integrity more realistically with a server database, and over heavier enterprise options because PostgreSQL is simpler to run locally in Docker.
+- **PostgreSQL** because I wanted one relational database that was strong both for local development and for a more production-like scenario. I chose it over MySQL mainly for consistency of SQL behavior, strong transactional support and smoother integration with the kinds of relational constraints used in this project. For this challenge, PostgreSQL gives me a very reliable default for user data, unique email constraints and token persistence without adding operational complexity in Docker.
 - **BCrypt** because password storage should be irreversible and intentionally expensive to brute-force. I chose it over storing plain hashes with algorithms like SHA256 because those are not appropriate for passwords. BCrypt is also simple to integrate here without introducing unnecessary auth complexity.
 - **JWT + Refresh Token** because the architecture requires the auth service to issue a token that can be validated independently by the reservations service. I chose this over server-side sessions because JWT fits microservice separation better, and I added refresh token rotation to avoid forcing frequent logins while still keeping short-lived access tokens.
 
@@ -27,6 +27,10 @@ This service does not call the reservations service directly. The frontend uses 
 ## Environment Variables
 
 Copy `.env.example` to `.env` and adjust only if needed.
+
+```bash
+cp .env.example .env
+```
 
 | Variable | Description |
 |---|---|
@@ -74,6 +78,15 @@ The authentication flow starts when the frontend calls `POST /auth/register` or 
 After a successful authentication, the service generates a JWT access token signed with `JWT_SECRET`. This token carries the authenticated user identity and is meant to be sent by the frontend to the reservations API. The service also generates a refresh token, stores only its hash in the database and returns the raw token to the client.
 
 When the frontend calls `POST /auth/refresh`, the API hashes the received refresh token, searches for the matching stored hash, validates expiration and rotates the refresh token before returning a new access token. In this architecture, this service is the only place responsible for credentials, password verification and token issuance.
+
+## Future Improvements
+
+These are small improvements that would be valuable in a next iteration, but would add extra complexity beyond the current challenge scope:
+
+- Add rate limiting for `login`, `register` and `refresh` endpoints to reduce brute-force and token abuse scenarios.
+- Return access token expiration metadata explicitly in the response contract so the frontend can synchronize refresh timing more accurately.
+- Add automated integration tests for the main auth flows, especially invalid credentials, duplicate registration and refresh token rotation.
+- Add structured audit fields for auth-relevant events, such as last successful login or refresh token issuance history.
 
 ## Routes
 
