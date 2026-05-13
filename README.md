@@ -1,62 +1,76 @@
 # banana-auth-api
 
-Authentication microservice — ASP.NET Core Web API.
+Authentication microservice for Banana Meeting Rooms.
+
+## Responsibility
+
+- Register users
+- Authenticate users
+- Issue JWT access tokens
+- Rotate refresh tokens
+
+This service does not call the reservations service directly. The frontend uses the JWT issued here to access `banana-reservations-api`.
 
 ## Tech Choices
 
-- **ASP.NET Core Web API**: simple and explicit REST API structure
-- **Entity Framework Core**: relational persistence with migrations support
-- **PostgreSQL**: independent relational database for the auth service
-- **BCrypt**: password hashing with a well-known and battle-tested algorithm
-- **JWT**: stateless access token for integration with the reservations API
+- **ASP.NET Core Web API** for a direct and explicit REST API
+- **Entity Framework Core** for relational persistence and migrations
+- **PostgreSQL** as the service database
+- **BCrypt** for password hashing
+- **JWT + Refresh Token** for auth and session renewal
 
-The project keeps the architecture lightweight: controller, service, repository, DTOs and entity model, without adding unnecessary layers.
+## Requirements
 
-## Routes
-
-- **GET /health** — Health check
-- **POST /auth/register** — Register a new user. Body: `{ email, password }`
-- **POST /auth/login** — Authenticate and receive JWT. Body: `{ email, password }`
-- **POST /auth/refresh** — Receive a new JWT and a new refresh token. Body: `{ refreshToken }`
+- Docker
+- Docker Compose
 
 ## Environment Variables
 
+Copy `.env.example` to `.env` and adjust only if needed.
+
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET` | Secret key for signing JWT tokens |
+| `DATABASE_URL` | PostgreSQL connection string used by the API container |
+| `JWT_SECRET` | Secret used to sign JWT tokens. It must be exactly the same value used by `banana-reservations-api` |
+| `ALLOWED_DOMAINS` | Allowed frontend origins separated by comma, or `*` in development |
 
-## Database
+Generate a strong shared secret with:
 
-The service uses Entity Framework Core with PostgreSQL.
+```bash
+openssl rand -base64 32
+```
 
-Database migrations are applied automatically on startup.
-
-## Recommended: Run with Docker
+## Run
 
 ```bash
 docker compose up --build
-
-# or
-
-docker-compose up --build
 ```
 
-This starts:
+The API will be available at `http://localhost:5000`.
 
-- **auth-api** — ASP.NET Core API on port 5000
-- **postgres-auth** — PostgreSQL database
+## Database, Migrations and Seeds
 
-## Manual setup
+- Migrations are applied automatically on startup
+- Initial auth users are seeded automatically on an empty database
 
-*Not recommended.*
+Seeded users:
 
-Requires:
+- `ana.silva@banana.local` / `Banana#2026`
+- `bruno.costa@banana.local` / `Banana#2026`
 
-- PostgreSQL installed locally
-- Environment variables configured manually
+If you want to recreate the database, migrations and seeds from scratch:
 
 ```bash
-cd src
-dotnet run
+docker compose down -v
+docker compose up --build
 ```
+
+## Routes
+
+- `GET /health`
+- `POST /auth/register`
+  Body: `{ email, password }`
+- `POST /auth/login`
+  Body: `{ email, password }`
+- `POST /auth/refresh`
+  Body: `{ refreshToken }`
