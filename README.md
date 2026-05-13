@@ -34,7 +34,9 @@ Copy `.env.example` to `.env` and adjust only if needed.
 | `JWT_SECRET` | Secret used to sign JWT tokens. It must be exactly the same value used by `banana-reservations-api` |
 | `ALLOWED_DOMAINS` | Allowed frontend origins separated by comma, or `*` in development |
 
-Generate a strong shared secret with:
+You can keep the shared example value from `.env.example` for quick local testing.
+
+Optional (recommended): generate a stronger shared secret with:
 
 ```bash
 openssl rand -base64 32
