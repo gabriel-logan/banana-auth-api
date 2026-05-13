@@ -82,6 +82,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.AddScoped<AuthDbInitializer>();
 builder.Services.AddScoped<AuthDbSeeder>();
 
 var app = builder.Build();
@@ -129,10 +130,8 @@ app.UseExceptionHandler(errorApp =>
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    var seeder = scope.ServiceProvider.GetRequiredService<AuthDbSeeder>();
-    dbContext.Database.Migrate();
-    await seeder.SeedAsync();
+    var initializer = scope.ServiceProvider.GetRequiredService<AuthDbInitializer>();
+    await initializer.InitializeAsync();
 }
 
 app.MapControllers();
